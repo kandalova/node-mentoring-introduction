@@ -1,14 +1,6 @@
 const { exec } = require('node:child_process');
 const os = require('node:os'); 
-
-function execCommand(command){
-
-	exec(command, (err, stdout, stderr)=>{
-		if(err) throw err;
-		console.clear();
-		console.log(stdout);
-	})
-}
+const fs = require('fs');
 
 
 function startServer(){
@@ -19,7 +11,30 @@ function startServer(){
 	const userOS = os.type();
 	const userCommand = userOS==='Windows_NT' ? commands.win : commands.unix;
 
-	setInterval(()=>execCommand(userCommand), 1000);
+	let lastMinuteTime = Date.now();
+	setInterval(()=>execCommand(), 1000);
+
+	function execCommand(){
+		const currentTime = Date.now();
+		const isTimeToLog = ((currentTime - lastMinuteTime) / 1000) >= 60;
+	
+		if (isTimeToLog) {
+			lastMinuteTime = currentTime;	
+		}
+	
+		exec(userCommand, (err, stdout, stderr)=>{
+			if(err) throw err;
+			console.clear();
+			console.log(stdout);
+	
+			if(isTimeToLog){
+				const logMsg = `${lastMinuteTime}: ${stdout}\r`;
+				fs.appendFile('activityMonitor.log', logMsg, (err) => {
+					if (err) throw err;
+				});
+			}
+		})
+	}
 }
 
 startServer();
