@@ -1,5 +1,12 @@
 # node-mentoring-introduction
 Task 1
+https://d17btkcdsmqrmh.cloudfront.net/node-gmp/docs/Intro/Homework
+
+-Create package.json by running the following commands npm init or npm init -y.
+-Install npm package nodemon globally or locally as dev dependency.
+-Create index.js file with getRandomNumber() function. The program should be started via npm script using nodemon.
+- Run getRandomNumber() function in REPL mode to perform operations from CLI.
+-Install NVM verify installation command -v nvm.
 
 #Working with nodemon and different versions of Node.js by using nvm
 <img width="675" alt="2023-08-30_18h43_37" src="https://github.com/kandalova/node-mentoring-introduction/assets/26093763/43527d63-fb6f-4970-91fa-2e1b58169cbc">
