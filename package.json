@@ -13,6 +13,7 @@
     "braces": "^3.0.2",
     "chokidar": "^3.5.3",
     "concat-map": "^0.0.1",
+    "csvtojson": "^2.0.10",
     "debug": "^3.2.7",
     "fill-range": "^7.0.1",
     "glob-parent": "^5.1.2",
@@ -39,10 +40,11 @@
     "undefsafe": "^2.0.5",
     "yallist": "^4.0.0"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+    "start": "nodemon index.js",
+    "task2": "nodemon ./utils/withTime.js",
+    "task3": "nodemon ./utils/MyCSVFormatter.js"
   },
   "keywords": [],
   "author": "",
