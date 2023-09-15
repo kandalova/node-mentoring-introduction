@@ -3,7 +3,7 @@ import csv from "csvtojson"
 
 async function csvToJson(path){
 	try {
-		const newFilePath='./assets/nodejs-hw1-ex1.txt';
+		const newFilePath='./csvdirectory/nodejs-hw1-ex1.txt';
 		const file = await open(path);
 		let headers;
 		writeFile(newFilePath, '');
@@ -41,5 +41,5 @@ function getFormatLine(headers, fields){
 	return JSON.stringify(resultObj);
 }
 
-csvToJson('./assets/nodejs-hw1-ex1.csv');
+csvToJson('./csvdirectory/nodejs-hw1-ex1.csv');
 
