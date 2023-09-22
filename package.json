@@ -5,7 +5,9 @@
   "main": "",
   "scripts": {
     "test": "jest",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "test:unit": "jest -c jest.unit.config.js",
+    "test:int": "jest -c jest.integration.config.js"
   },
   "author": "",
   "license": "ISC",

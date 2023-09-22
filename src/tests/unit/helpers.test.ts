@@ -1,5 +1,5 @@
-import { validateInput, shortenPublicHoliday } from "./helpers";
-import { SUPPORTED_COUNTRIES } from './config';
+import { validateInput, shortenPublicHoliday } from "../../helpers";
+import { SUPPORTED_COUNTRIES } from '../../config';
 
 const HOLIDAY = {
 	date: "123",
@@ -23,7 +23,7 @@ const YEAR = 2023;
 const COUNTRY = "GB";
 
 describe("Validate input", ()=>{
-	jest.mock('./config', () => ({ SUPPORTED_COUNTRIES: ['GB']}));
+	jest.mock('../../config', () => ({ SUPPORTED_COUNTRIES: ['GB']}));
 
 	test("should return true", ()=>{
 		const validateInputResponse = validateInput({year: YEAR, country: COUNTRY});
@@ -50,7 +50,7 @@ describe("Validate input", ()=>{
 		expect(()=>validateInput({year, country: COUNTRY})).toThrow(`Year provided not the current, received: ${year}`);
 	});
 
-	afterAll(()=>{
+	afterEach(()=>{
 		jest.clearAllMocks();
 	})
 });
@@ -61,7 +61,7 @@ describe("Get shorten Public Holiday", ()=>{
 		const shortHoliday = shortenPublicHoliday(HOLIDAY);
 		expect(shortHoliday).toEqual(SHORT_HOLIDAY);
 	})
-	afterAll(()=>{
+	afterEach(()=>{
 		jest.clearAllMocks();
 	})
 })
