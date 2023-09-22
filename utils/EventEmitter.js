@@ -19,8 +19,8 @@ export default class EventEmitter {
  
 	once(eventName, fn) {
 		const onceWrapper = (...args)=>{			
-			this.off(eventName, onceWrapper);
 			fn(...args);
+			this.off(eventName, onceWrapper);
 		}
 		this._pushListener(eventName, onceWrapper);
 	}
