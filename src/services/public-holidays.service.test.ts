@@ -3,128 +3,172 @@ import * as helpers from '../helpers';
 import { checkIfTodayIsPublicHoliday, getListOfPublicHolidays, getNextPublicHolidays } from './public-holidays.service';
 import { PUBLIC_HOLIDAYS_API_URL } from '../config';
 
+jest.mock('../config', () => ({ PUBLIC_HOLIDAYS_API_URL: "https://api.genderize.io" }));
 
+const YEAR = 2023;
+const COUNTRY = 'GB';
 
-const INPUT = {
-	year: 2023,
-	country: 'GB'
+const MOCKED_HOLYDAY = {
+	"date": "2023-09-21",
+	"localName": "string",
+	"name": "string",
+	"countryCode": "string",
+	"fixed": true,
+	"global": true,
+	"counties": [
+		"GB"
+	],
+	"launchYear": 0,
+	"types": [
+		"Public"
+	]
 }
 
-const MOCKED_HOLYDAYS = [
-  {
-    "date": "2023-09-21",
-    "localName": "string",
-    "name": "string",
-    "countryCode": "string",
-    "fixed": true,
-    "global": true,
-    "counties": [
-      "GB"
-    ],
-    "launchYear": 0,
-    "types": [
-      "Public"
-    ]
-  }
-]
+const SHORT_HOLIDAY = {
+	"date": "2023-09-21",
+	"localName": "string",
+	"name": "string",
+}
 
-const SHORT_HOLIDAYS = [
-  {
-    "date": "2023-09-21",
-    "localName": "string",
-    "name": "string",
-  }
-]
+describe("Get list of public holidays", () => {
+	it("Should return array of short holidays", async () => {
+		jest.spyOn(axios, 'get').mockImplementation(() => Promise.resolve({ data: [MOCKED_HOLYDAY] }));
+		jest.spyOn(helpers, "validateInput").mockImplementation(() => true);
+		const shortenSpy = jest.spyOn(helpers, "shortenPublicHoliday").mockImplementation(() => SHORT_HOLIDAY);
 
-describe("Get list of public holidays", ()=>{
-	it("Should return array of short holidays", async ()=>{
-		jest.spyOn(axios, 'get').mockImplementation(() => Promise.resolve({ data: MOCKED_HOLYDAYS }));
-		
-		//this imported method is used inside getListOfPublicHolidays 
-		//Should I spy, mock it or not?
-		// jest.spyOn(helpers, "validateInput").mockImplementation(()=>true);
-		// jest.spyOn(helpers, "shortenPublicHoliday").withImplementation;
+		const holidaysResponse = await getListOfPublicHolidays(YEAR, COUNTRY);
 
-		const holidaysResponse = await getListOfPublicHolidays(INPUT.year, INPUT.country);
-		expect(holidaysResponse).toEqual(SHORT_HOLIDAYS);
+		expect(shortenSpy).toHaveBeenCalledWith(MOCKED_HOLYDAY);
+		expect(holidaysResponse).toHaveLength(1);
+		expect(holidaysResponse[0]).toEqual(SHORT_HOLIDAY);
 	});
 
-	it("Should call API with proper args", async ()=>{
-		jest.mock('../config', () => ({ PUBLIC_HOLIDAYS_API_URL: "https://api.genderize.io"}));
-		const axiosSpy = jest.spyOn(axios, 'get').mockImplementation(() => Promise.resolve({ data: MOCKED_HOLYDAYS }));
-		await getListOfPublicHolidays(INPUT.year, INPUT.country);
-		expect(axiosSpy).toHaveBeenCalledWith(`${PUBLIC_HOLIDAYS_API_URL}/PublicHolidays/${INPUT.year}/${INPUT.country}`,);
+	it("Should call API with proper args", async () => {		
+		const axiosSpy = jest.spyOn(axios, 'get').mockImplementation(() => Promise.resolve());
+		jest.spyOn(helpers, "validateInput").mockImplementation(() => true);
+		jest.spyOn(helpers, "shortenPublicHoliday").mockImplementation(() => SHORT_HOLIDAY);
+
+		await getListOfPublicHolidays(YEAR, COUNTRY);
+
+		expect(axiosSpy).toHaveBeenCalledWith(`${PUBLIC_HOLIDAYS_API_URL}/PublicHolidays/${YEAR}/${COUNTRY}`,);
 	});
 
-	it("Should return empty error",async () => {
+	it("Should return empty array", async () => {
+		jest.spyOn(helpers, "validateInput").mockImplementation(() => true);
+		jest.spyOn(helpers, "shortenPublicHoliday").mockImplementation(() => SHORT_HOLIDAY);
 		jest.spyOn(axios, 'get').mockImplementation(() => Promise.reject(new Error('api error')));
-		const holidaysResponse = await getListOfPublicHolidays(INPUT.year, INPUT.country);
+
+		const holidaysResponse = await getListOfPublicHolidays(YEAR, COUNTRY);
+
+		expect(holidaysResponse).toHaveLength(0);
 		expect(holidaysResponse).toEqual([]);
 	});
 
-	//I checked these throws for validation function
-	// Should I also check it here?
-	it("Should throw year error",async () => {
-		await expect(getListOfPublicHolidays(2022, INPUT.country)).rejects.toThrowError(`Year provided not the current, received: ${2022}`)
+	it("Should throw validation error", async () => {
+		jest.spyOn(helpers, "validateInput").mockImplementation(() => {throw new Error(`Validation error`)});
+		jest.spyOn(helpers, "shortenPublicHoliday").mockImplementation(() => SHORT_HOLIDAY);
+		jest.spyOn(axios, 'get').mockImplementation(() => Promise.reject(new Error('api error')));
+
+		await expect(getListOfPublicHolidays(YEAR, COUNTRY)).rejects.toThrowError(`Validation error`);
 	});
 
-	it("Should throw country  error",async () => {
-		await expect(getListOfPublicHolidays(2022, INPUT.country)).rejects.toThrowError(`Year provided not the current, received: ${2022}`)
-	});
-
-	afterEach(()=>{
+	afterEach(() => {
 		jest.clearAllMocks();
 	})
 });
 
-describe("Today is public holiday", ()=>{
-	it("Should return true", async()=>{
-		jest.spyOn(axios, 'get').mockImplementation(() => Promise.resolve({ status:200 }));
-		const todayResponce = await checkIfTodayIsPublicHoliday(INPUT.country);
+describe("Today is public holiday", () => {
+	it("Should return true", async () => {
+		jest.spyOn(helpers, "validateInput").mockImplementation(() => true);
+		jest.spyOn(axios, 'get').mockImplementation(() => Promise.resolve({ status: 200 }));
+
+		const todayResponce = await checkIfTodayIsPublicHoliday(COUNTRY);
+
 		expect(todayResponce).toBeTruthy();
 	});
 
-	it("Should call API with proper args", async ()=>{
-		jest.mock('../config', () => ({ PUBLIC_HOLIDAYS_API_URL: "https://api.genderize.io"}));
-		const axiosSpy = jest.spyOn(axios, 'get').mockImplementation(() => Promise.resolve({ status:200 }));
-		await checkIfTodayIsPublicHoliday(INPUT.country);
-		expect(axiosSpy).toHaveBeenCalledWith(`${PUBLIC_HOLIDAYS_API_URL}/IsTodayPublicHoliday/${INPUT.country}`,);
+	it("Should call API with proper args", async () => {
+		jest.spyOn(helpers, "validateInput").mockImplementation(() => true);
+		const axiosSpy = jest.spyOn(axios, 'get').mockImplementation(() => Promise.resolve({ status: 200 }));
+
+		await checkIfTodayIsPublicHoliday(COUNTRY);
+
+		expect(axiosSpy).toHaveBeenCalledWith(`${PUBLIC_HOLIDAYS_API_URL}/IsTodayPublicHoliday/${COUNTRY}`,);
 	});
 
-	it("Should return false from response", async()=>{
-		jest.spyOn(axios, 'get').mockImplementation(() => Promise.resolve({ status:500 }));
-		const todayResponce = await checkIfTodayIsPublicHoliday(INPUT.country);
+	it("Should return false from response", async () => {
+		jest.spyOn(helpers, "validateInput").mockImplementation(() => true);
+		jest.spyOn(axios, 'get').mockImplementation(() => Promise.resolve({ status: 500 }));
+
+		const todayResponce = await checkIfTodayIsPublicHoliday(COUNTRY);
+
 		expect(todayResponce).toBeFalsy();
 	});
 
-	it("Should return false from error", async()=>{
+	it("Should return false from error", async () => {
+		jest.spyOn(helpers, "validateInput").mockImplementation(() => true);
 		jest.spyOn(axios, 'get').mockImplementation(() => Promise.reject());
-		const todayResponce = await checkIfTodayIsPublicHoliday(INPUT.country);
+
+		const todayResponce = await checkIfTodayIsPublicHoliday(COUNTRY);
+
 		expect(todayResponce).toBeFalsy();
 	});
-	
-	afterEach(()=>{
+
+	it("Should throw validation error", async () => {
+		jest.spyOn(helpers, "validateInput").mockImplementation(() => {throw new Error(`Validation error`)});
+		jest.spyOn(axios, 'get').mockImplementation(() => Promise.reject());
+		
+		await expect(checkIfTodayIsPublicHoliday(COUNTRY)).rejects.toThrowError(`Validation error`);
+	});
+
+	afterEach(() => {
 		jest.clearAllMocks();
 	})
 });
 
-describe("Get next public holidays", ()=>{
-	it("Should return array of short holidays",async () => {
-		jest.spyOn(axios, 'get').mockImplementation(() => Promise.resolve({ data: MOCKED_HOLYDAYS }));
-		const holidaysResponse = await getNextPublicHolidays(INPUT.country);
-		expect(holidaysResponse).toEqual(SHORT_HOLIDAYS);		
+describe("Get next public holidays", () => {
+	it("Should return array of short holidays", async () => {
+		jest.spyOn(axios, 'get').mockImplementation(() => Promise.resolve({ data: [MOCKED_HOLYDAY] }));
+		jest.spyOn(helpers, "validateInput").mockImplementation(() => true);
+		const shortenSpy = jest.spyOn(helpers, "shortenPublicHoliday").mockImplementation(() => SHORT_HOLIDAY);
+
+		const holidaysResponse = await getNextPublicHolidays(COUNTRY);
+
+		expect(shortenSpy).toHaveBeenCalledWith(MOCKED_HOLYDAY);
+		expect(holidaysResponse).toHaveLength(1);
+		expect(holidaysResponse[0]).toEqual(SHORT_HOLIDAY);
 	});
 
-	it("Should call API with proper args", async ()=>{
-		jest.mock('../config', () => ({ PUBLIC_HOLIDAYS_API_URL: "https://api.genderize.io"}));
-		const axiosSpy = jest.spyOn(axios, 'get').mockImplementation(() => Promise.resolve({data: MOCKED_HOLYDAYS}));
-		await getNextPublicHolidays(INPUT.country);
-		expect(axiosSpy).toHaveBeenCalledWith(`${PUBLIC_HOLIDAYS_API_URL}/NextPublicHolidays/${INPUT.country}`,);
+	it("Should call API with proper args", async () => {
+		const axiosSpy = jest.spyOn(axios, 'get').mockImplementation(() => Promise.resolve());
+		jest.spyOn(helpers, "validateInput").mockImplementation(() => true);
+		jest.spyOn(helpers, "shortenPublicHoliday").mockImplementation(() => SHORT_HOLIDAY);
+
+		await getNextPublicHolidays(COUNTRY);
+
+		expect(axiosSpy).toHaveBeenCalledWith(`${PUBLIC_HOLIDAYS_API_URL}/NextPublicHolidays/${COUNTRY}`,);
 	});
 
-	it("Should return empty error",async () => {
+	it("Should return empty array", async () => {
+		jest.spyOn(helpers, "validateInput").mockImplementation(() => true);
+		jest.spyOn(helpers, "shortenPublicHoliday").mockImplementation(() => SHORT_HOLIDAY);
 		jest.spyOn(axios, 'get').mockImplementation(() => Promise.reject(new Error('api error')));
-		const holidaysResponse = await getNextPublicHolidays(INPUT.country);
+
+		const holidaysResponse = await getNextPublicHolidays(COUNTRY);
+
+		expect(holidaysResponse).toHaveLength(0);
 		expect(holidaysResponse).toEqual([]);
 	});
+
+	it("Should throw validation error", async () => {
+		jest.spyOn(helpers, "validateInput").mockImplementation(() => {throw new Error(`Validation error`)});
+		jest.spyOn(helpers, "shortenPublicHoliday").mockImplementation(() => SHORT_HOLIDAY);
+		jest.spyOn(axios, 'get').mockImplementation(() => Promise.reject(new Error('api error')));
+
+		await expect(getNextPublicHolidays(COUNTRY)).rejects.toThrowError(`Validation error`);
+	});
+
+	afterEach(() => {
+		jest.clearAllMocks();
+	})
 })
