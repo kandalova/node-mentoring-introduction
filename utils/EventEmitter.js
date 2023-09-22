@@ -34,7 +34,7 @@ export default class EventEmitter {
 	}
  
 	listenerCount(eventName) {
-		return this.listeners[eventName].length || 0;
+		return this.listeners[eventName] ? this.listeners[eventName].length : 0;
 	}
  
 	rawListeners(eventName) {
@@ -60,5 +60,8 @@ export default class EventEmitter {
 			throw new Error("There is no such eventName!")
 		}
 		this.listeners[eventName] = this.listeners[eventName].filter((currFn)=>currFn !== fn);
+		if(this.listeners[eventName].length === 0){
+			delete this.listeners[eventName];
+		}
 	}
  }

@@ -42,4 +42,3 @@ function getFormatLine(headers, fields){
 }
 
 csvToJson('./csvdirectory/nodejs-hw1-ex1.csv');
-

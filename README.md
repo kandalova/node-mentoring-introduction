@@ -47,5 +47,3 @@ Parsed csv strings
 Generated file 
 
 <img width="769" alt="2023-09-15_22h52_06" src="https://github.com/kandalova/node-mentoring-introduction/assets/26093763/addeb9fd-7123-4a3d-98da-2380a2679284">
-
-
