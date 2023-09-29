@@ -31,8 +31,10 @@ export const writeUser = async (user) => {
 	try {
 		const users = await readData(DB_PATH);
 		const newId = getNewId(users);
-		users.push({ id: newId, ...user });
+		const newUSer = { id: newId, ...user };
+		users.push(newUSer);
 		await writeData(DB_PATH, users);
+		return newUSer;
 	}
 	catch (err) {
 		throw err

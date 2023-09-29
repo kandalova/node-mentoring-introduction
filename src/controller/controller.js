@@ -26,8 +26,8 @@ export const getUserById = async (req, res) => {
 export const createNewUser = async (req, res) => {
 	try {
 		await getReqBody(req).then(async (body) => {
-			await writeUser(body);
-			sendResp(res, "Created", 201);
+			const newUser = await writeUser(body);
+			sendResp(res, newUser , 201);
 		})
 	}
 	catch (err) {
