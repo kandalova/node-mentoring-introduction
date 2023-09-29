@@ -12,8 +12,6 @@ function handleRequstUrl(req){
 export function stripTrailingSlash(url){
 	//replace end slash
 	let result = url.replace(/\/$/, '');
-	//replace start slash
-	// result = result.replace(/^\//, '');
 	//remove double slash
 	result = result.replace(/\/\//, '/');
 	return result;
