@@ -1,5 +1,5 @@
 import { createServer } from "http";
-import { createNewUser, deleteUser, getUserById, getUsers } from "./src/controller/controller.js";
+import { createNewUser, deleteUser, getUserById, getUsers, updateUser } from "./src/controller/controller.js";
 import { isUserById, stripTrailingSlash } from "./src/utils/utils.js";
 import { sendResp } from "./src/utils/resp_utils.js";
 
@@ -20,6 +20,9 @@ const server = createServer(async (req, res) => {
 		}
 		else if (req.method === 'DELETE' && isUserById(url)) {
 			await deleteUser(req, res);
+		}
+		else if (req.method === 'PATCH' && isUserById(url)) {
+			await updateUser(req, res);
 		}
 		else {
 			throw new Error('No such resource');

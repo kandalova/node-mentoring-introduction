@@ -42,12 +42,32 @@ export const writeUser = async (user) => {
 export const removeUser = async (id) => {
 	try {
 		const users = await readData(DB_PATH);
-		let index = users.findIndex((element) => element.id == id);
+		const index = users.findIndex((element) => element.id == id);
 		if(index === -1){
 			throwUserError(id);
 		}
 		users.splice(index, 1);
 		await writeData(DB_PATH, users);
+	}
+	catch (err) {
+		throw err
+	}
+}
+
+export const rewriteUser = async (id, values) => {
+	try {
+		const users = await readData(DB_PATH);
+		const user= users.find((element) => element.id == id);
+		if(!user){
+			throwUserError(id);
+		}
+		for (const [key, value] of Object.entries(values)) {
+			console.log(`${key}: ${value}`);
+			if(user.hasOwnProperty(key)){
+				user[key] = value;
+			};
+			await writeData(DB_PATH, users);
+		}
 	}
 	catch (err) {
 		throw err
