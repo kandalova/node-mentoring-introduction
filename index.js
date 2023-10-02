@@ -1,13 +1,14 @@
 import { createServer } from "http";
 import { createNewUser, createUserHobby, deleteUser, deleteUserHobby, getUserById, getUserHobbies, getUsers, updateUser } from "./src/controller/controller.js";
-import { isUserById, isUserHobbies, isUserHobby, stripTrailingSlash } from "./src/utils/utils.js";
+import { isHobby, isUserById, isUserHobbies, isUserHobby, stripTrailingSlash } from "./src/utils/utils.js";
 import { sendResp } from "./src/utils/resp_utils.js";
+import { getHobby } from "./src/controller/hobbies-controller.js";
 
 const server = createServer(async (req, res) => {
 	try {
 		const url = stripTrailingSlash(req.url);
-		console.log(url);
-		console.log(req.method);
+		// console.log(url);
+		// console.log(req.method);
 
 		if (req.method === 'GET' && url === '/users') {
 			await getUsers(res);
@@ -32,6 +33,9 @@ const server = createServer(async (req, res) => {
 		}
 		else if (req.method === 'DELETE' && isUserHobby(url)) {
 			await deleteUserHobby(req, res);
+		}
+		else if (req.method === 'GET' && isHobby(url)) {
+			await getHobby(req, res);
 		}
 		else {
 			throw new Error('No such resource');

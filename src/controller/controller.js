@@ -1,12 +1,25 @@
 import { getReqBody, sendResp } from "../utils/resp_utils.js";
-import { getHobby, getId, getIdForHobbies } from "../utils/utils.js";
+import { getHobbyFromUrl, getId, getIdForHobbies } from "../utils/utils.js";
+import { hateoasify } from "./hateoas-controller.js";
 import { popUserPropertyValue, pushUserPropertyValue, readUser, readUsers, removeUser, rewriteUser, writeUser } from "./users-controller.js";
 
+const HOBBIES_HATEOAS = {
+	rel: "hobby",
+	path:"hobbies",
+	method: "GET"
+}
 const removeUserHobbies = (users) => {
-	return users.map(({ hobbies, ...rest }) => {
-		return rest;
+	return users.map((user) => {
+		return hateoasifyHobbies(user);
 	})
 };
+
+const hateoasifyHobbies = ({hobbies, ...rest})=>{
+	if(hobbies && hobbies.length){
+		rest.links = hateoasify(hobbies, HOBBIES_HATEOAS);
+	}
+	return rest;
+}
 
 export const getUsers = async (res) => {
 	try {
@@ -22,8 +35,9 @@ export const getUsers = async (res) => {
 export const getUserById = async (req, res) => {
 	try {
 		const [id] = getId(req.url);
-		const { hobbies, ...user } = await readUser(id);
-		sendResp(res, user);
+		const user = await readUser(id);
+		const hateoasUser = hateoasifyHobbies(user);
+		sendResp(res, hateoasUser);
 	}
 	catch (err) {
 		throw err;
@@ -33,8 +47,9 @@ export const getUserById = async (req, res) => {
 export const createNewUser = async (req, res) => {
 	try {
 		await getReqBody(req).then(async (body) => {
-			const newUser = await writeUser(body);
-			sendResp(res, newUser, 201);
+			const user = await writeUser(body);
+			const hateoasUser = hateoasifyHobbies(user);
+			sendResp(res, hateoasUser, 201);
 		})
 	}
 	catch (err) {
@@ -98,7 +113,7 @@ export const createUserHobby = async (req, res) => {
 export const deleteUserHobby = async (req, res) => {
 	try {
 		const [_, id] = getIdForHobbies(req.url);
-		const [hobby] = getHobby(req.url);
+		const [hobby] = getHobbyFromUrl(req.url);
 		await popUserPropertyValue(id, "hobbies", hobby);
 		sendResp(res, "Deleted", 204);
 	}

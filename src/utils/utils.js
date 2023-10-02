@@ -14,6 +14,10 @@ export function isUserHobby(url){
 	return /users\/(\d+)\/hobbies\/\w+$/.test(url);
 }
 
+export function isHobby(url){
+	return /hobbies\/(\w+)$/.test(url);
+}
+
 function handleRequstUrl(req){
 	const baseURL = 'http://' + req.headers.host + '/';
 	return new URL(req.url, baseURL);
@@ -28,14 +32,14 @@ export function stripTrailingSlash(url){
 }
 
 export function getId(url){
-	return url.match(/([0-9]+)$/g);
+	return url.match(/([0-9]+)/g);
 }
 
 export function getIdForHobbies(url){
 	return url.match(/([0-9]+)\/hobbies/);
 }
 
-export function getHobby(url){
+export function getHobbyFromUrl(url){
 	return url.match(/\w+$/);
 }
 
