@@ -31,6 +31,9 @@ export const writeUser = async (user) => {
 	try {
 		const users = await readData(DB_PATH);
 		const newId = getNewId(users);
+		if(!user.hobbies){
+			user.hobbies=[];
+		}
 		const newUSer = { id: newId, ...user };
 		users.push(newUSer);
 		await writeData(DB_PATH, users);
