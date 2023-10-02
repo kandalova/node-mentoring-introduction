@@ -4,6 +4,16 @@ export function isUserById(url){
 	return /users\/(\d+)$/.test(url);
 }
 
+export function isUserHobbies(url){
+	return /users\/(\d+)\/hobbies$/.test(url);
+}
+
+export function isUserHobby(url){
+	console.log(url);
+	console.log(/users\/(\d+)\/hobbies\/\w+$/.test(url));
+	return /users\/(\d+)\/hobbies\/\w+$/.test(url);
+}
+
 function handleRequstUrl(req){
 	const baseURL = 'http://' + req.headers.host + '/';
 	return new URL(req.url, baseURL);
@@ -19,6 +29,14 @@ export function stripTrailingSlash(url){
 
 export function getId(url){
 	return url.match(/([0-9]+)$/g);
+}
+
+export function getIdForHobbies(url){
+	return url.match(/([0-9]+)\/hobbies/);
+}
+
+export function getHobby(url){
+	return url.match(/\w+$/);
 }
 
 export function getNewId(arr){

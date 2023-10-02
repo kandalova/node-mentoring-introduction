@@ -1,6 +1,6 @@
 import { createServer } from "http";
-import { createNewUser, deleteUser, getUserById, getUsers, updateUser } from "./src/controller/controller.js";
-import { isUserById, stripTrailingSlash } from "./src/utils/utils.js";
+import { createNewUser, createUserHobby, deleteUser, deleteUserHobby, getUserById, getUserHobbies, getUsers, updateUser } from "./src/controller/controller.js";
+import { isUserById, isUserHobbies, isUserHobby, stripTrailingSlash } from "./src/utils/utils.js";
 import { sendResp } from "./src/utils/resp_utils.js";
 
 const server = createServer(async (req, res) => {
@@ -23,6 +23,15 @@ const server = createServer(async (req, res) => {
 		}
 		else if (req.method === 'PATCH' && isUserById(url)) {
 			await updateUser(req, res);
+		}
+		else if (req.method === 'GET' && isUserHobbies(url)) {
+			await getUserHobbies(req, res);
+		}
+		else if (req.method === 'POST' && isUserHobbies(url)) {
+			await createUserHobby(req, res);
+		}
+		else if (req.method === 'DELETE' && isUserHobby(url)) {
+			await deleteUserHobby(req, res);
 		}
 		else {
 			throw new Error('No such resource');
