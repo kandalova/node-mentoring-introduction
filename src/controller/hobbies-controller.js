@@ -5,7 +5,7 @@ export const getHobby = async (req, res) => {
 	try {
 		//mock functionality
 		const [hobby] = getHobbyFromUrl(req.url);
-		sendResp(res, hobby, 200);
+		sendResp(res, {hobby}, 200, true);
 	}
 	catch (err) {
 		throw err;
