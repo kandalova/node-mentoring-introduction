@@ -1,0 +1,17 @@
+{
+  "name": "mentoring-introduction-rest-api",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Task 4",
+  "main": "index.js",
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
